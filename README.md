@@ -1,4 +1,4 @@
-# grocery_trak_web
+# GroceryTrakWeb
 
 A new Flutter project.
 
