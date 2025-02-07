@@ -1,6 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+//Camera interface
+
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
 
