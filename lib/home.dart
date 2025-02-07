@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:camera/camera.dart';
-import 'models/ingredient_model.dart';
-import 'models/recipe_model.dart';
-import 'camera_screen.dart'; // import the camera screen we'll create next
+import 'package:grocery_trak_web/models/ingredient_model.dart';
+import 'package:grocery_trak_web/models/recipe_model.dart';
 
 class MyHomePage extends StatefulWidget {
-  final String title;
-  final CameraDescription camera; // Accept a camera description
+  MyHomePage({super.key, required this.title});
 
-  MyHomePage({super.key, required this.title, required this.camera});
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -26,12 +32,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    super.initState();
     _generateInfo();
   }
 
   @override
   Widget build(BuildContext context) {
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: appBar(),
@@ -41,9 +52,13 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _searchField(),
-            SizedBox(height: 40),
+            SizedBox(
+              height: 40,
+            ),
             _ingredients(),
-            SizedBox(height: 40),
+            SizedBox(
+              height: 40,
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -52,30 +67,30 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     'Recommended Recipes',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                    ),
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800),
                   ),
                 ),
-                SizedBox(height: 15),
+                SizedBox(
+                  height: 15,
+                ),
                 Container(
                   color: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.only(left: 20, right: 20),
                   child: GridView.builder(
                     shrinkWrap: true,
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 210,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 0.6,
+                        maxCrossAxisExtent: 210,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 0.6
                     ),
                     itemBuilder: (context, index) {
                       return Container(
                         decoration: BoxDecoration(
-                          color: recipes[index].boxColor.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                            color: recipes[index].boxColor.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(20)),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -86,31 +101,36 @@ class _MyHomePageState extends State<MyHomePage> {
                             Text(
                               recipes[index].name,
                               style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                  fontSize: 16),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                '${recipes[index].difficulty} | ${recipes[index].duration} mins | ${recipes[index].kCal} kCal',
+                                recipes[index].difficulty +
+                                    ' | ' +
+                                    recipes[index].duration +
+                                    ' mins | ' +
+                                    recipes[index].kCal +
+                                    ' kCal',
                                 style: TextStyle(
                                   color: Color(0xff7B6B72),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w400,
                                 ),
+                                
                               ),
                             ),
                             Container(
                               height: 45,
                               width: 130,
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Color(0xff9DCEFF), Color(0xff92A3FD)],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                                  gradient: LinearGradient(colors: [
+                                    Color(0xff9DCEFF),
+                                    Color(0xff92A3FD)
+                                  ]),
+                                  borderRadius: BorderRadius.circular(20)),
                               child: Center(
                                 child: Text(
                                   'View',
@@ -121,14 +141,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 ),
                               ),
-                            ),
+                            )
                           ],
                         ),
                       );
                     },
                     itemCount: recipes.length,
                   ),
-                ),
+                )
               ],
             ),
           ],
@@ -139,116 +159,95 @@ class _MyHomePageState extends State<MyHomePage> {
 
   AppBar appBar() {
     return AppBar(
-      backgroundColor: Colors.green,
-      title: Text('Grocery Trak'),
-      leading: Container(
-        margin: EdgeInsets.all(10),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.amber[100],
-          borderRadius: BorderRadius.circular(10),
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Colors.green,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(
+          'Grocery Trak',
+          style: TextStyle(),
         ),
-        child: SvgPicture.asset('assets/icons/Arrow - Left 2.svg'),
-      ),
-      actions: [
-        PopupMenuButton<int>(
-          onSelected: (value) async {
-            if (value == 1) {
-              // Launch the camera interface when "Scan" is selected.
-              final imagePath = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CameraScreen(camera: widget.camera),
-                ),
-              );
-              if (imagePath != null) {
-                // Process the captured image (for example, pass the path to your CV model)
-                print("Captured image: $imagePath");
-              }
-            } else if (value == 2) {
-              // Handle Profile option.
-            } else if (value == 3) {
-              // Handle Sign Out option.
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 1,
-              child: Row(
-                children: [
-                  Icon(Icons.camera),
-                  SizedBox(width: 10),
-                  Text("Scan"),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 2,
-              child: Row(
-                children: [
-                  Icon(Icons.star),
-                  SizedBox(width: 10),
-                  Text("Profile"),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 3,
-              child: Row(
-                children: [
-                  Icon(Icons.chrome_reader_mode),
-                  SizedBox(width: 10),
-                  Text("Sign Out"),
-                ],
-              ),
-            ),
-          ],
-          position: PopupMenuPosition.under,
-          child: Container(
+        leading: Container(
             margin: EdgeInsets.all(10),
             alignment: Alignment.center,
-            width: 37,
             decoration: BoxDecoration(
-              color: Colors.amber[100],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: SvgPicture.asset(
-              'assets/icons/dots.svg',
-              height: 5,
-              width: 5,
-            ),
-          ),
-        ),
-      ],
-    );
+                color: Colors.amber[100],
+                borderRadius: BorderRadius.circular(10)),
+            child: SvgPicture.asset('assets/icons/Arrow - Left 2.svg')),
+        actions: [
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              // PopupMenuItem 1
+              PopupMenuItem(
+                value: 1,
+                // row with 2 children
+                child: Row(
+                  children: [
+                    Icon(Icons.star),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text("Profile")
+                  ],
+                ),
+              ),
+              // PopupMenuItem 2
+              PopupMenuItem(
+                value: 2,
+                // row with two children
+                child: Row(
+                  children: [
+                    Icon(Icons.chrome_reader_mode),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text("Sign Out")
+                  ],
+                ),
+              ),
+            ],
+            position: PopupMenuPosition.under,
+            child: Container(
+                margin: EdgeInsets.all(10),
+                alignment: Alignment.center,
+                width: 37,
+                decoration: BoxDecoration(
+                    color: Colors.amber[100],
+                    borderRadius: BorderRadius.circular(10)),
+                child: SvgPicture.asset(
+                  'assets/icons/dots.svg',
+                  height: 5,
+                  width: 5,
+                )),
+          )
+        ]);
   }
 
-  // Search Field and _ingredients methods remain unchanged...
+  // Search Field
   Container _searchField() {
     return Container(
       margin: EdgeInsets.only(top: 40, left: 20, right: 20),
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(
-          color: Color(0xff1D1617).withOpacity(0.11),
-          blurRadius: 40,
-          spreadRadius: 0.0,
-        ),
+            color: Color(0xff1D1617).withOpacity(0.11),
+            blurRadius: 40,
+            spreadRadius: 0.0)
       ]),
       child: TextField(
         decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: EdgeInsets.all(15),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.all(12),
-            child: SvgPicture.asset("assets/icons/Search.svg"),
-          ),
-          hintText: 'Search Recipe',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none,
-          ),
-        ),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: EdgeInsets.all(15),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.all(12),
+              child: SvgPicture.asset("assets/icons/Search.svg"),
+            ),
+            hintText: 'Search Recipe',
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide.none)),
       ),
     );
   }
@@ -262,56 +261,49 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Text(
             'Ingredient',
             style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
+                color: Colors.black, fontSize: 18, fontWeight: FontWeight.w800),
           ),
         ),
-        SizedBox(height: 15),
+        SizedBox(
+          height: 15,
+        ),
         SizedBox(
           height: 150,
           child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            separatorBuilder: (context, index) => SizedBox(width: 25),
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            itemCount: ingredients.length,
-            itemBuilder: (context, index) {
-              return Container(
-                width: 100,
-                decoration: BoxDecoration(
-                  color: ingredients[index].boxColor.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SvgPicture.asset(ingredients[index].iconPath),
-                      ),
-                    ),
-                    Text(
-                      ingredients[index].name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
+              scrollDirection: Axis.horizontal,
+              separatorBuilder: (context, index) => SizedBox(
+                    width: 25,
+                  ),
+              padding: EdgeInsets.only(left: 20, right: 20),
+              itemCount: ingredients.length,
+              itemBuilder: (context, index) {
+                return Container(
+                    width: 100,
+                    decoration: BoxDecoration(
+                        color: ingredients[index].boxColor.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  color: Colors.white, shape: BoxShape.circle),
+                              child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SvgPicture.asset(
+                                      ingredients[index].iconPath))),
+                          Text(
+                            ingredients[index].name,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black,
+                                fontSize: 14),
+                          )
+                        ]));
+              }),
+        )
       ],
     );
   }
