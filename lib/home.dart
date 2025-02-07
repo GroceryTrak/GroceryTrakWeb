@@ -3,11 +3,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camera/camera.dart';
 import 'models/ingredient_model.dart';
 import 'models/recipe_model.dart';
-import 'camera_screen.dart'; // import the camera screen we'll create next
+import 'camera_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;
-  final CameraDescription camera; // Accept a camera description
+  final CameraDescription camera; 
 
   MyHomePage({super.key, required this.title, required this.camera});
 
