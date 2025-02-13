@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/recipe_model.dart';
-import 'recipe_details_page.dart'; // Import your RecipeDetailsPage
+import 'recipe_details_page.dart';
+import 'dart:math';
+
+Color getRandomColor() {
+  return Color.fromRGBO(
+    Random().nextInt(256), // Red
+    Random().nextInt(256), // Green
+    Random().nextInt(256), // Blue
+    0.3, // Opacity
+  );
+}
 
 class RecipeGrid extends StatelessWidget {
   final List<RecipeModel> recipes;
@@ -13,6 +23,7 @@ class RecipeGrid extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Title for the grid.
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
           child: Text(
@@ -39,20 +50,28 @@ class RecipeGrid extends StatelessWidget {
             ),
             itemCount: recipes.length,
             itemBuilder: (context, index) {
+              final recipe = recipes[index];
               return Container(
                 decoration: BoxDecoration(
-                  color: recipes[index].boxColor.withOpacity(0.3),
+                  color: getRandomColor(),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    SvgPicture.asset(
-                      recipes[index].iconPath,
-                      height: 70,
-                    ),
+                    // Display the icon if available, otherwise show a placeholder icon.
+                    recipe.iconPath != null && recipe.iconPath!.isNotEmpty
+                        ? SvgPicture.asset(
+                            recipe.iconPath!,
+                            height: 70,
+                          )
+                        : Icon(
+                            Icons.restaurant_menu,
+                            size: 70,
+                            color: Colors.grey,
+                          ),
                     Text(
-                      recipes[index].name,
+                      recipe.name,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
@@ -62,7 +81,7 @@ class RecipeGrid extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        '${recipes[index].difficulty} | ${recipes[index].duration} mins | ${recipes[index].kCal} kCal',
+                        '${recipe.difficulty} | ${recipe.duration} mins | ${recipe.kcal} kCal',
                         style: TextStyle(
                           color: Color(0xff7B6B72),
                           fontSize: 13,
@@ -77,7 +96,7 @@ class RecipeGrid extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                RecipeDetailsPage(recipe: recipes[index]),
+                                RecipeDetailsPage(recipe: recipe),
                           ),
                         );
                       },
@@ -112,4 +131,3 @@ class RecipeGrid extends StatelessWidget {
     );
   }
 }
-  

@@ -7,6 +7,7 @@ import 'widgets/ingredients_list.dart';
 import 'widgets/recipe_grid.dart';
 import 'models/ingredient_model.dart';
 import 'models/recipe_model.dart';
+import 'services/recipe_api_service.dart'; // Import the API service
 
 class MyHomePage extends StatefulWidget {
   final String title;
@@ -23,15 +24,30 @@ class _MyHomePageState extends State<MyHomePage> {
   List<IngredientModel> ingredients = [];
   List<RecipeModel> recipes = [];
 
+  bool _isLoading = true; // Flag to show loading indicator
+
   @override
   void initState() {
     super.initState();
     _generateInfo();
   }
 
-  void _generateInfo() {
+  // Modified to asynchronously fetch recipes from the backend API.
+  Future<void> _generateInfo() async {
+    // Use static/dummy data for ingredients (if still needed)
     ingredients = IngredientModel.getRecipes();
-    recipes = RecipeModel.getRecipes();
+
+    try {
+      // Using the API service to fetch recipes.
+      // Assumes that an empty search query returns all recipes.
+      recipes = await RecipeApiService.searchRecipes("");
+    } catch (e) {
+      print("Error fetching recipes: $e");
+      recipes = RecipeModel.getRecipes(); // Fallback to an empty list on error.
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _onItemTapped(int index) {
@@ -44,18 +60,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(context, widget.camera),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SearchField(),
-            SizedBox(height: 40),
-            IngredientsList(ingredients: ingredients),
-            SizedBox(height: 40),
-            RecipeGrid(recipes: recipes), // ✅ Recipe Grid now correctly included
-          ],
-        ),
-      ),
+      body: _isLoading 
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SearchField(),
+                  SizedBox(height: 40),
+                  IngredientsList(ingredients: ingredients),
+                  SizedBox(height: 40),
+                  RecipeGrid(recipes: recipes),
+                ],
+              ),
+            ),
       bottomNavigationBar: BottomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
