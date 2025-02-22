@@ -19,7 +19,7 @@ class IngredientModel {
     try {
       // Using the API service to fetch recipes.
       // Adjust the query string as needed.
-      String query = "Chicken&ingredients=2,3";
+      // String query = "Chicken&ingredients=2,3";
       items = await ItemApiService.searchItems(query);
     } catch (e) {
       print("Error fetching recipes: $e");

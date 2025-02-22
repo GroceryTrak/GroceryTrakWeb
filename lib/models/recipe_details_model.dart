@@ -27,8 +27,6 @@ class RecipeDetailsModel extends ChangeNotifier {
   Future<void> fetchDetails() async {
     try {
       final updatedRecipe = await RecipeApiService.fetchRecipeById(_recipe.id);
-      
-      print(updatedRecipe);
       _recipe = updatedRecipe;
 
     } catch (e) {

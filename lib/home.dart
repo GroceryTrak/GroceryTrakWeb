@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:grocery_trak_web/models/item_model.dart';
+import 'package:grocery_trak_web/models/userItem_model.dart';
 import 'package:grocery_trak_web/services/item_api_service.dart';
+import 'package:grocery_trak_web/services/userItem_api_service.dart';
 import 'widgets/app_bar.dart';
 import 'widgets/bottom_nav_bar.dart';
-import 'widgets/search_field.dart';
+import 'widgets/multi_search.dart';
 import 'widgets/ingredients_list.dart';
 import 'widgets/recipe_grid.dart';
 import 'models/recipe_model.dart';
-import 'services/recipe_api_service.dart'; // Import the API service
+import 'services/recipe_api_service.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;
@@ -22,9 +24,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  List<ItemModel> ingredients = [];
+  List<UserItemModel> _allIngredients = [];
+  List<UserItemModel> ingredients = [];
   List<RecipeModel> recipes = [];
-  bool _isLoading = true; // Flag to show loading indicator
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -32,27 +35,62 @@ class _MyHomePageState extends State<MyHomePage> {
     _generateInfo();
   }
 
-  // Asynchronously fetch recipes and ingredients from the backend API.
   Future<void> _generateInfo() async {
-    String queryItem = "Chicken";
+    // Load all ingredients once
     try {
-      // Await the Future<List<ItemModel>> returned from the API service.
-      ingredients = await ItemApiService.searchItems(queryItem);
+      _allIngredients = await UserItemApiService.retrieveUserItems();
+      // Initially, you may want to show no ingredients or all ingredients.
+      // For this example, we'll start with an empty list until a selection is made.
+      ingredients = [];
     } catch (e) {
       print("Error fetching ingredients: $e");
-      ingredients = []; // Fallback to an empty list on error.
+      _allIngredients = [];
+      ingredients = [];
     }
 
+    // Load default recipes (you might change this default query as needed)
     try {
-      // Using the API service to fetch recipes.
-      String query = "Chicken&ingredients=2,3";
+      String query = "ingredients=";
       recipes = await RecipeApiService.searchRecipes(query);
     } catch (e) {
       print("Error fetching recipes: $e");
-      recipes = []; // Fallback to an empty list on error.
+      recipes = [];
     }
 
-    // Update UI state to reflect that data has been loaded.
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  // This callback is triggered by the multi-select widget after the user taps "OK".
+  // The query string is expected in the format "ingredients=2,3"
+  Future<void> _searchRecipes(String query) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Extract the ingredient IDs from the query string.
+    String idsStr = query.replaceFirst("ingredients=", "");
+    List<String> selectedIds =
+        idsStr.split(',').where((id) => id.trim().isNotEmpty).toList();
+    print("Selected ingredient IDs: $selectedIds");
+    if (selectedIds.isNotEmpty) {
+    selectedIds[0] = selectedIds[0].replaceAll("&", "");
+    }
+    print("Selected ingredient IDs: $selectedIds");
+
+    // Filter the full ingredients list based on the selected IDs.
+    ingredients = _allIngredients.where((ingredient) {
+      // Assuming ingredient.itemId is a numeric value or a string.
+      return selectedIds.contains(ingredient.itemId.toString());
+    }).toList();
+
+    try {
+      recipes = await RecipeApiService.searchRecipes(query);
+    } catch (e) {
+      print("Error searching recipes: $e");
+      recipes = [];
+    }
     setState(() {
       _isLoading = false;
     });
@@ -68,14 +106,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(context, widget.camera),
-      body: _isLoading 
+      body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SearchField(),
+                  // The multi-select search bar will call _searchRecipes when selections are made.
+                  MultiSelectSearchBar(onSelectionDone: _searchRecipes),
                   SizedBox(height: 40),
+                  // Display only the ingredients matching the selected options.
                   IngredientsList(ingredients: ingredients),
                   SizedBox(height: 40),
                   RecipeGrid(recipes: recipes),
