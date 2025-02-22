@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../models/recipe_model.dart';
-import 'recipe_details_page.dart';
+import '../widgets/recipe_details_page.dart'; 
 import 'dart:math';
 
 Color getRandomColor() {

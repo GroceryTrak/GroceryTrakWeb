@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../models/ingredient_model.dart';
+import 'package:grocery_trak_web/models/recipe_item.dart';
 import 'package:flutter_svg/svg.dart';
 
 class IngredientsList extends StatelessWidget {
-  final List<IngredientModel> ingredients;
+  final List<ItemModel> ingredients;
 
   IngredientsList({required this.ingredients});
 
@@ -31,7 +31,7 @@ class IngredientsList extends StatelessWidget {
               return Container(
                 width: 100,
                 decoration: BoxDecoration(
-                  color: ingredients[index].boxColor.withOpacity(0.3),
+                  // color: ingredients[index].boxColor.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -43,7 +43,7 @@ class IngredientsList extends StatelessWidget {
                       decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: SvgPicture.asset(ingredients[index].iconPath),
+                        // child: SvgPicture.asset(ingredients[index].iconPath),
                       ),
                     ),
                     Text(

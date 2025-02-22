@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:grocery_trak_web/models/recipe_item.dart';
+import 'package:grocery_trak_web/services/item_api_service.dart';
 import 'widgets/app_bar.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/search_field.dart';
 import 'widgets/ingredients_list.dart';
 import 'widgets/recipe_grid.dart';
-import 'models/ingredient_model.dart';
 import 'models/recipe_model.dart';
 import 'services/recipe_api_service.dart'; // Import the API service
 
@@ -21,9 +22,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  List<IngredientModel> ingredients = [];
+  List<ItemModel> ingredients = [];
   List<RecipeModel> recipes = [];
-
   bool _isLoading = true; // Flag to show loading indicator
 
   @override
@@ -32,19 +32,27 @@ class _MyHomePageState extends State<MyHomePage> {
     _generateInfo();
   }
 
-  // Modified to asynchronously fetch recipes from the backend API.
+  // Asynchronously fetch recipes and ingredients from the backend API.
   Future<void> _generateInfo() async {
-    // Use static/dummy data for ingredients (if still needed)
-    ingredients = IngredientModel.getRecipes();
+    String queryItem = "Chicken";
+    try {
+      // Await the Future<List<ItemModel>> returned from the API service.
+      ingredients = await ItemApiService.searchItems(queryItem);
+    } catch (e) {
+      print("Error fetching ingredients: $e");
+      ingredients = []; // Fallback to an empty list on error.
+    }
 
     try {
       // Using the API service to fetch recipes.
-      // Assumes that an empty search query returns all recipes.
-      recipes = await RecipeApiService.searchRecipes("");
+      String query = "Chicken&ingredients=2,7";
+      recipes = await RecipeApiService.searchRecipes(query);
     } catch (e) {
       print("Error fetching recipes: $e");
-      recipes = RecipeModel.getRecipes(); // Fallback to an empty list on error.
+      recipes = []; // Fallback to an empty list on error.
     }
+
+    // Update UI state to reflect that data has been loaded.
     setState(() {
       _isLoading = false;
     });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grocery_trak_web/models/recipe_item.dart';
 import '../services/recipe_api_service.dart';
 import 'recipe_model.dart';
 
@@ -20,13 +21,16 @@ class RecipeDetailsModel extends ChangeNotifier {
   int get duration => _recipe.duration;
   int get kcal => _recipe.kcal;
   String? get iconPath => _recipe.iconPath;
-  List<RecipeItem> get ingredients => _recipe.ingredients;
+  List<ItemModel> get ingredients => _recipe.ingredients;
 
   /// Fetches updated recipe details from the backend API.
   Future<void> fetchDetails() async {
     try {
       final updatedRecipe = await RecipeApiService.fetchRecipeById(_recipe.id);
+      
+      print(updatedRecipe);
       _recipe = updatedRecipe;
+
     } catch (e) {
       print("Error fetching recipe details: $e");
     } finally {
@@ -41,7 +45,7 @@ class RecipeDetailsModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateIngredients(List<RecipeItem> newIngredients) {
+  void updateIngredients(List<ItemModel> newIngredients) {
     _recipe = _recipe.copyWith(ingredients: newIngredients);
     notifyListeners();
   }
