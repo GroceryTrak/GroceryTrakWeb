@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:grocery_trak_web/models/recipe_item.dart';
+import 'package:grocery_trak_web/models/item_model.dart';
 import 'package:grocery_trak_web/services/item_api_service.dart';
 import 'widgets/app_bar.dart';
 import 'widgets/bottom_nav_bar.dart';
@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     try {
       // Using the API service to fetch recipes.
-      String query = "Chicken&ingredients=2,7";
+      String query = "Chicken&ingredients=2,3";
       recipes = await RecipeApiService.searchRecipes(query);
     } catch (e) {
       print("Error fetching recipes: $e");

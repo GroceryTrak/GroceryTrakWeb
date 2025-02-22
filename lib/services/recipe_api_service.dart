@@ -9,7 +9,6 @@ class RecipeApiService {
   /// Fetches a recipe by its ID.
   static Future<RecipeModel> fetchRecipeById(int id) async {
     final response = await http.get(Uri.parse('$baseUrl/recipe/$id'));
-    print("Response Body: ${response.body}");
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       return RecipeModel.fromJson(jsonData);

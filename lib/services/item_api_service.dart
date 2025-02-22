@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:grocery_trak_web/models/recipe_item.dart';
+import 'package:grocery_trak_web/models/item_model.dart';
 import 'package:http/http.dart' as http;
 
 class ItemApiService {

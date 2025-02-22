@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:grocery_trak_web/models/recipe_item.dart';
+import 'package:grocery_trak_web/models/item_model.dart';
 import 'package:grocery_trak_web/services/item_api_service.dart';
 
 class IngredientModel {
