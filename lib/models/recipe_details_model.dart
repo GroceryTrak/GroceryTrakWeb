@@ -20,7 +20,8 @@ class RecipeDetailsModel extends ChangeNotifier {
   String get difficulty => _recipe.difficulty;
   int get duration => _recipe.duration;
   int get kcal => _recipe.kcal;
-  String? get iconPath => _recipe.iconPath;
+  String? get diet => _recipe.diet;
+  String? get imageLink => recipe.imageLink;
   List<ItemModel> get ingredients => _recipe.ingredients;
 
   /// Fetches updated recipe details from the backend API.

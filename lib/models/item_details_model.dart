@@ -17,6 +17,8 @@ class ItemDetailsModel extends ChangeNotifier {
   int get id => _item.id;
   String get name => _item.name;
   String get description => _item.description;
+  String get imageLink => _item.imageLink;
+
 
   /// Fetches updated item details from the backend API.
   Future<void> fetchDetails() async {
@@ -27,6 +29,8 @@ class ItemDetailsModel extends ChangeNotifier {
       _item = _item.copyWith(
         name: updatedItem.name,
         description: updatedItem.description,
+        imageLink: updatedItem.imageLink,
+
       );
     } catch (e) {
       print("Error fetching item details: $e");

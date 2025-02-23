@@ -2,6 +2,11 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:grocery_trak_web/models/userItem_model.dart';
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class UserItemApiService {
   static const String _baseUrl = 'https://backend.grocerytrak.com';
@@ -100,5 +105,79 @@ class UserItemApiService {
       throw Exception('Failed to fetch user items');
     }
   }
+
+  static final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: "https://backend.grocerytrak.com",
+      connectTimeout: Duration(seconds: 10),
+      receiveTimeout: Duration(seconds: 10),
+    ),
+  );
+
+  /// Predict item by sending an image file (for mobile).
+  static Future<UserItemModel> predictItem(File imageFile) async {
+    try {
+      String fileName = imageFile.path.split('/').last;
+      FormData formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      });
+
+      
+      _dio.interceptors.add(LogInterceptor(
+        request: true,
+        requestBody: true,
+        responseBody: true,
+        error: true,
+      ));
+
+      Response response = await _dio.post(
+        '/user-item/predict',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return UserItemModel.fromJson(response.data);
+      } else {
+        throw Exception('Failed to predict item (Status: ${response.statusCode})');
+      }
+    } catch (e) {
+      debugPrint("Error in predictItem: $e");
+      throw Exception('Failed to predict item');
+    }
+  }
+
+  // /// Predict item by sending image bytes (for web).
+  // static Future<ItemModel> predictItemFromBytes(Uint8List imageBytes, String fileName) async {
+  //   // print("Image Byte: $imageBytes");
+  //   // fileName = "image.png";
+  //   // print("Filename: $fileName");
+  //   try {
+  //     FormData formData = FormData.fromMap({
+  //       'image': MultipartFile.fromBytes(
+  //         imageBytes,
+  //         filename: fileName,
+  //         contentType: MediaType('image', 'jpeg'),
+  //       ),
+  //     });
+
+  //     Response response = await _dio.post(
+  //       '/item/predict',
+  //       data: formData,
+  //       options: Options(contentType: 'multipart/form-data'),
+  //     );
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       return ItemModel.fromJson(response.data);
+  //     } else {
+  //       throw Exception('Failed to predict item (Status: ${response.statusCode})');
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error in predictItemFromBytes: $e");
+  //     throw Exception('Failed to predict item');
+  //   }
+  // }
 
 }

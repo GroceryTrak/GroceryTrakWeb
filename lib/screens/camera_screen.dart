@@ -1,9 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/material.dart';
-import 'package:grocery_trak_web/services/item_api_service.dart';
-import 'dart:io'; // Only used on mobile
 import 'package:grocery_trak_web/models/item_model.dart';
+import 'package:grocery_trak_web/models/userItem_model.dart';
+import 'dart:io'; // Only used on mobile
+import 'package:grocery_trak_web/services/userItem_api_service.dart';
 
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -40,21 +41,21 @@ class _CameraScreenState extends State<CameraScreen> {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
       // print("Image: $image");
-      ItemModel predictedItem;
+      UserItemModel predictedItem= UserItemModel(userId: 0 ,itemId: 0,item: ItemModel(id: 0, name: "NA", description: "NA"),quantity: 0, unit: "N/A");
 
 
       if (kIsWeb) {
-        // For web: read image bytes and use a custom API method.
-        // print("IN if");
-        Uint8List imageBytes = await image.readAsBytes();
+        // // For web: read image bytes and use a custom API method.
+        // // print("IN if");
+        // Uint8List imageBytes = await image.readAsBytes();
 
-        // final imageBytes = await image.readAsBytes();
-        // print("after finaal");
-        predictedItem = await ItemApiService.predictItemFromBytes(imageBytes, image.name);
+        // // final imageBytes = await image.readAsBytes();
+        // // print("after finaal");
+        // predictedItem = await ItemApiService.predictItemFromBytes(imageBytes, image.name);
       } else {
         // For mobile: use the file from image.path.
         final imageFile = File(image.path);
-        predictedItem = await ItemApiService.predictItem(imageFile);
+        predictedItem = await UserItemApiService.predictItem(imageFile);
       }
 
       // Show the predicted item result.
@@ -62,7 +63,7 @@ class _CameraScreenState extends State<CameraScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text("Predicted Item"),
-          content: Text("Item Name: ${predictedItem.name}"),
+          content: Text("Item Name: ${predictedItem.item.name}"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),

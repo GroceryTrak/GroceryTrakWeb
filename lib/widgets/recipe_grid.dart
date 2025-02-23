@@ -1,8 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../models/recipe_model.dart';
-import '../widgets/recipe_details_page.dart'; 
-import 'dart:math';
+import '../widgets/recipe_details_page.dart';
 
 Color getRandomColor() {
   return Color.fromRGBO(
@@ -35,14 +35,14 @@ class RecipeGrid extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 15),
+        const SizedBox(height: 15),
         Container(
           color: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: GridView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 210,
               crossAxisSpacing: 20,
               mainAxisSpacing: 20,
@@ -59,20 +59,22 @@ class RecipeGrid extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Display the icon if available, otherwise show a placeholder icon.
-                    recipe.iconPath != null && recipe.iconPath!.isNotEmpty
-                        ? SvgPicture.asset(
-                            recipe.iconPath!,
-                            height: 70,
-                          )
-                        : Icon(
-                            Icons.restaurant_menu,
-                            size: 70,
-                            color: Colors.grey,
-                          ),
+                    // Display the imageLink if available; fall back to icon if not.
+                    if (recipe.imageLink.isNotEmpty)
+                          Image.network(
+                              recipe.imageLink,
+                              height: 70,
+                              fit: BoxFit.cover,
+                            )
+                    else
+                      const Icon(
+                        Icons.restaurant_menu,
+                        size: 70,
+                        color: Colors.grey,
+                      ),
                     Text(
                       recipe.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
                         fontSize: 16,
@@ -82,7 +84,7 @@ class RecipeGrid extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         '${recipe.difficulty} | ${recipe.duration} mins | ${recipe.kcal} kCal',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xff7B6B72),
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
@@ -104,12 +106,12 @@ class RecipeGrid extends StatelessWidget {
                         height: 45,
                         width: 130,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             colors: [Color(0xff9DCEFF), Color(0xff92A3FD)],
                           ),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             'View',
                             style: TextStyle(

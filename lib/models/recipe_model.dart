@@ -7,7 +7,8 @@ class RecipeModel {
   final String difficulty;
   final int duration;
   final int kcal;
-  final String? iconPath;
+  final String diet;
+  final String imageLink;
   List<ItemModel> ingredients;
   // final bool vegan,
 
@@ -18,8 +19,11 @@ class RecipeModel {
     this.difficulty = "Unknown",
     this.duration = 0,
     this.kcal = 0,
-    this.iconPath,
+    this.diet = "",
+    this.imageLink = "",
+    
     List<ItemModel>? ingredients,
+
   }) : ingredients = ingredients ?? [];
 
   RecipeModel copyWith({
@@ -29,7 +33,8 @@ class RecipeModel {
     String? difficulty,
     int? duration,
     int? kcal,
-    String? iconPath,
+    String? diet,
+    String? imageLink,
     List<ItemModel>? ingredients,
   }) {
     return RecipeModel(
@@ -39,7 +44,8 @@ class RecipeModel {
       difficulty: difficulty ?? this.difficulty,
       duration: duration ?? this.duration,
       kcal: kcal ?? this.kcal,
-      iconPath: iconPath ?? this.iconPath,
+      diet: diet ?? this.diet,
+      imageLink: imageLink ?? this.imageLink,
       ingredients: ingredients ?? this.ingredients,
     );
   }
@@ -53,7 +59,8 @@ class RecipeModel {
     difficulty: json['difficulty'] as String? ?? "Unknown",
     duration: json['duration'] as int? ?? 0,
     kcal: json['kcal'] as int? ?? 0,
-    iconPath: json['iconPath'] as String?,
+    diet: json['diet'] as String? ?? "",
+    imageLink: json['image_link'] as String? ?? "",
     ingredients: (json['ingredients'] as List<dynamic>?)
             ?.map((ingredient) {
               // Extract the nested item
@@ -78,7 +85,8 @@ class RecipeModel {
       'difficulty': difficulty,
       'duration': duration,
       'kcal': kcal,
-      if (iconPath != null) 'iconPath': iconPath,
+      'diet': diet,
+      'image_link': imageLink,
       'ingredients': ingredients.map((item) => item.toJson()).toList(),
     };
   }

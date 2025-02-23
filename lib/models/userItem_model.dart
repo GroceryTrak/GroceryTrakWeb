@@ -1,3 +1,5 @@
+import 'package:grocery_trak_web/models/item_model.dart';
+
 class UserItemModel {
   final int userId;
   final int itemId;
@@ -30,34 +32,6 @@ class UserItemModel {
       'item': item.toJson(),
       'quantity': quantity,
       'unit': unit,
-    };
-  }
-}
-
-class ItemModel {
-  final int id;
-  final String name;
-  final String description;
-
-  ItemModel({
-    required this.id,
-    required this.name,
-    required this.description,
-  });
-
-  factory ItemModel.fromJson(Map<String, dynamic> json) {
-    return ItemModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      description: json['description'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
     };
   }
 }
