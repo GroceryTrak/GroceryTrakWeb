@@ -15,6 +15,8 @@ class BottomNavBar extends StatelessWidget {
     required this.camera,
   }) : super(key: key);
 
+  
+
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(

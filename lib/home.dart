@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:grocery_trak_web/main.dart';
 import 'package:grocery_trak_web/models/userItem_model.dart';
+import 'package:grocery_trak_web/screens/camera_screen.dart';
 import 'package:grocery_trak_web/services/userItem_api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'widgets/app_bar.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/multi_search.dart';
@@ -21,38 +23,19 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with RouteAware {
-
+class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   List<UserItemModel> _allIngredients = [];
   List<UserItemModel> ingredients = [];
   List<RecipeModel> recipes = [];
   bool _isLoading = true;
 
+  // New state variable to hold the captured selection for the multi search bar
+  List<String> capturedSelection = [];
+
   @override
   void initState() {
     super.initState();
-    _generateInfo();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final route = ModalRoute.of(context);
-    if (route is PageRoute) {
-      routeObserver.subscribe(this, route);
-    }
-  }
-
-  @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
-    super.dispose();
-  }
-
-  @override
-  void didPopNext() {
-    // Called when the current route is re-displayed after popping another route.
     _generateInfo();
   }
   
@@ -60,8 +43,6 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     // Load all ingredients once
     try {
       _allIngredients = await UserItemApiService.retrieveUserItems();
-      // Initially, you may want to show no ingredients or all ingredients.
-      // For this example, we'll start with an empty list until a selection is made.
       ingredients = [];
     } catch (e) {
       print("Error fetching ingredients: $e");
@@ -69,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
       ingredients = [];
     }
 
-    // Load default recipes (you might change this default query as needed)
+    // Load default recipes (change this default query as needed)
     try {
       String query = "ingredients=";
       recipes = await RecipeApiService.searchRecipes(query);
@@ -83,26 +64,20 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     });
   }
 
-  // This callback is triggered by the multi-select widget after the user taps "OK".
-  // The query string is expected in the format "ingredients=2,3"
+  // Callback from the multi-select widget.
   Future<void> _searchRecipes(String query) async {
     setState(() {
       _isLoading = true;
     });
 
     // Extract the ingredient IDs from the query string.
-    String idsStr = query.replaceFirst("ingredients=", "");
+    String idsStr = query.replaceFirst("ingredients=", "").replaceFirst("&", "");
     List<String> selectedIds =
         idsStr.split(',').where((id) => id.trim().isNotEmpty).toList();
-    print("Selected ingredient IDs: $selectedIds");
-    if (selectedIds.isNotEmpty) {
-    selectedIds[0] = selectedIds[0].replaceAll("&", "");
-    }
     print("Selected ingredient IDs: $selectedIds");
 
     // Filter the full ingredients list based on the selected IDs.
     ingredients = _allIngredients.where((ingredient) {
-      // Assuming ingredient.itemId is a numeric value or a string.
       return selectedIds.contains(ingredient.itemId.toString());
     }).toList();
 
@@ -117,10 +92,31 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _onItemTapped(int index) async {
+    if (index == 2) {
+      // Push the camera screen and wait for the captured result.
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CameraScreen(camera: widget.camera),
+        ),
+      );
+
+      if (result != null) {
+        // Expecting the result to be a UserItemModel.
+        UserItemModel capturedItem = result as UserItemModel;
+        // Update the multi search selection with the captured item's display string.
+        setState(() {
+          capturedSelection = ['${capturedItem.item.name} (${capturedItem.itemId})'];
+        });
+        // Automatically search recipes based on the captured item.
+        _searchRecipes("&ingredients=${capturedItem.itemId}");
+      }
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
@@ -133,10 +129,11 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // The multi-select search bar will call _searchRecipes when selections are made.
-                  MultiSelectSearchBar(onSelectionDone: _searchRecipes),
+                  MultiSelectSearchBar(
+                    onSelectionDone: _searchRecipes,
+                    initialSelection: capturedSelection,
+                  ),
                   SizedBox(height: 40),
-                  // Display only the ingredients matching the selected options.
                   IngredientsList(ingredients: ingredients),
                   SizedBox(height: 40),
                   RecipeGrid(recipes: recipes),

@@ -5,7 +5,8 @@ import 'package:grocery_trak_web/services/userItem_api_service.dart';
 
 class MultiSelectSearchBar extends StatefulWidget {
   final Function(String) onSelectionDone;
-  const MultiSelectSearchBar({Key? key, required this.onSelectionDone}) : super(key: key);
+  final List<String>? initialSelection;
+  const MultiSelectSearchBar({Key? key, required this.onSelectionDone, this.initialSelection}) : super(key: key);
 
   @override
   _MultiSelectSearchBarState createState() => _MultiSelectSearchBarState();
@@ -21,12 +22,21 @@ class _MultiSelectSearchBarState extends State<MultiSelectSearchBar> {
     super.initState();
     _loadOptions();
   }
+  
+  @override
+  void didUpdateWidget(covariant MultiSelectSearchBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialSelection != oldWidget.initialSelection) {
+      setState(() {
+        selectedOptions = widget.initialSelection ?? [];
+      });
+    }
+  }
 
   // Call the API to retrieve options.
   Future<void> _loadOptions() async {
     try {
       List<UserItemModel> response = await UserItemApiService.retrieveUserItems();
-      // Convert each item's model into a string like "ItemName (id)"
       List<String> items = response
           .map((r) => '${r.item.name} (${r.itemId})')
           .toList();
@@ -34,6 +44,10 @@ class _MultiSelectSearchBarState extends State<MultiSelectSearchBar> {
       setState(() {
         options = items;
         isLoading = false;
+        if (widget.initialSelection != null) {
+          // Ensure that the initial selection exists in the options list.
+          selectedOptions = widget.initialSelection!.where((sel) => items.contains(sel)).toList();
+        }
       });
     } catch (e) {
       setState(() {
@@ -94,14 +108,12 @@ class _MultiSelectSearchBarState extends State<MultiSelectSearchBar> {
       setState(() {
         selectedOptions = results;
       });
-      // Extract ids from selected options (assuming each option is like "Name (id)")
       List<String> ingredientIds = selectedOptions.map((option) {
         final regex = RegExp(r'\((.*?)\)');
         final match = regex.firstMatch(option);
         return match != null ? match.group(1)!.trim() : '';
       }).where((id) => id.isNotEmpty).toList();
       String query = "&ingredients=" + ingredientIds.join(',');
-      // Call the callback function passed from parent to update recipes.
       widget.onSelectionDone(query);
     }
   }
