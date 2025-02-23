@@ -22,7 +22,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with RouteAware {
-final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
   int _selectedIndex = 0;
   List<UserItemModel> _allIngredients = [];
