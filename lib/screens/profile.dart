@@ -1,12 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'login_screen.dart';
 
-class ProfilePage extends StatelessWidget {
+// Ensure you have this function implemented, for example:
+Future<String?> loadUsername() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('username');
+}
+
+class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
-  // You can later replace these with actual user data.
-  final String userName = 'John Doe';
-  final String userEmail = 'john.doe@example.com';
-  // final String profileImagePath = 'assets/images/profile_placeholder.png'; // Ensure you add this asset to your pubspec.yaml
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String? username;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
+
+  void _loadUsername() async {
+    final loadedUsername = await loadUsername();
+    setState(() {
+      username = loadedUsername;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,24 +53,16 @@ class ProfilePage extends StatelessWidget {
                   // Profile Picture
                   CircleAvatar(
                     radius: 50,
-                    // backgroundImage: AssetImage(profileImagePath),
-                    // TODO; Add profile image path
+                    // Uncomment and add your profile image asset if available:
+                    // backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    userName,
+                    username ?? 'John Doe',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    userEmail,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
                     ),
                   ),
                 ],
@@ -58,39 +73,18 @@ class ProfilePage extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  _buildOption(
-                    context,
-                    icon: Icons.history,
-                    title: 'Cooking History',
-                    onTap: () {
-                      // TODO: Navigate to cooking history screen
-                    },
-                  ),
-                  const Divider(),
-                  _buildOption(
-                    context,
-                    icon: Icons.favorite,
-                    title: 'Favorite Recipes',
-                    onTap: () {
-                      // TODO: Navigate to favorite recipes screen
-                    },
-                  ),
-                  const Divider(),
-                  _buildOption(
-                    context,
-                    icon: Icons.settings,
-                    title: 'Settings',
-                    onTap: () {
-                      // TODO: Navigate to settings screen
-                    },
-                  ),
                   const Divider(),
                   _buildOption(
                     context,
                     icon: Icons.logout,
                     title: 'Sign Out',
                     onTap: () {
-                      // TODO: Handle sign out action
+                      // Add any additional sign-out logic before navigation if needed.
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                        (route) => false,
+                      );
                     },
                   ),
                 ],
@@ -102,7 +96,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// A helper widget to build each profile option.
+  /// Helper widget to build a profile option tile.
   Widget _buildOption(BuildContext context,
       {required IconData icon, required String title, required VoidCallback onTap}) {
     return ListTile(

@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'dart:math';
+import '../models/recipe_details_model.dart';
 import '../models/recipe_model.dart';
+
+Color getRandomPastelColor() {
+  final random = Random();
+  final hue = random.nextDouble() * 360;
+  final saturation = 0.4 + random.nextDouble() * 0.3; 
+  final value = 0.8 + random.nextDouble() * 0.2;
+  return HSVColor.fromAHSV(1.0, hue, saturation, value).toColor();
+}
 
 class RecipeDetailsPage extends StatelessWidget {
   final RecipeModel recipe;
@@ -9,126 +19,191 @@ class RecipeDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(recipe.name),
-        backgroundColor: Colors.green,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Recipe Icon/Image
-            Center(
-              child: SvgPicture.asset(
-                recipe.iconPath,
-                height: 150,
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            // Recipe Title
-            Text(
-              recipe.name,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            // Recipe stats: difficulty, duration, and kCal
-            Row(
-              children: [
-                Text(
-                  recipe.difficulty,
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  '${recipe.duration} mins',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  '${recipe.kCal} kCal',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24.0),
-            // Recipe Description Section
-            const Text(
-              "Description",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            const Text(
-              "This recipe is a delightful dish that blends flavors perfectly. "
-              "Add your favorite ingredients and adjust the spices to taste. "
-              "You can include detailed instructions, cooking tips, and personal notes here.",
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 24.0),
-            // Ingredients Section
-            const Text(
-              "Ingredients",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            ..._buildIngredientsList(),
-            const SizedBox(height: 24.0),
-            // Cooking Steps Section
-            const Text(
-              "Cooking Steps",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            ..._buildCookingSteps(),
-          ],
-        ),
+    return ChangeNotifierProvider<RecipeDetailsModel>(
+      create: (_) => RecipeDetailsModel(recipe: recipe),
+      child: Consumer<RecipeDetailsModel>(
+        builder: (context, model, child) {
+          return Scaffold(
+            backgroundColor: Colors.grey[100],
+            body: model.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : CustomScrollView(
+                    slivers: [
+                      /// 1. A SliverAppBar with a large top image
+                      SliverAppBar(
+                        expandedHeight: 300,
+                        pinned: true,
+                        floating: false,
+                        backgroundColor: Colors.green,
+                        title: Text(model.name),
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              // Top "hero" image or fallback
+                              model.imageLink != null && model.imageLink!.isNotEmpty
+                                  ? Image.network(
+                                      model.imageLink!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(color: Colors.grey[300]),
+                              // A gradient overlay to darken the top for text contrast
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.black.withOpacity(0.4),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      /// 2. Main content in a container with random pastel background
+                      SliverToBoxAdapter(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: getRandomPastelColor(),
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              /// 2.1 Recipe Title
+                              Text(
+                                model.name,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+
+                              /// 2.2 Recipe stats: difficulty, duration, kcal
+                              Row(
+                                children: [
+                                  _StatChip(label: model.difficulty),
+                                  const SizedBox(width: 8),
+                                  _StatChip(label: '${model.duration} mins'),
+                                  const SizedBox(width: 8),
+                                  _StatChip(label: '${model.kcal} kCal'),
+                                ],
+                              ),
+                              const SizedBox(height: 24.0),
+
+                              /// 2.3 Instructions Section
+                              const Text(
+                                "Instructions",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  model.instruction.isNotEmpty
+                                      ? model.instruction
+                                      : "No instructions provided.",
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              const SizedBox(height: 24.0),
+
+                              /// 2.4 Ingredients Section
+                              const Text(
+                                "Ingredients",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: model.ingredients.isNotEmpty
+                                      ? model.ingredients.map((ingredient) {
+                                          return Padding(
+                                            padding:
+                                                const EdgeInsets.symmetric(vertical: 4.0),
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.check_circle,
+                                                  size: 18,
+                                                  color: Colors.green,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    ingredient.name,
+                                                    style: const TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList()
+                                      : [
+                                          const Text(
+                                            "No ingredients provided.",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ],
+                                ),
+                              ),
+                              const SizedBox(height: 24.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          );
+        },
       ),
     );
   }
+}
 
-  /// Returns a list of placeholder widgets for the ingredients.
-  List<Widget> _buildIngredientsList() {
-    // Replace with actual data from recipe if available.
-    List<String> ingredients = [
-      "1 cup of ingredient A",
-      "2 tbsp of ingredient B",
-      "Salt to taste",
-      "Pepper to taste",
-    ];
+/// A small widget to display each stat (e.g. difficulty, duration, kcal) in a random-color chip.
+class _StatChip extends StatelessWidget {
+  final String label;
 
-    return ingredients.map((ingredient) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Text(
-          ingredient,
-          style: const TextStyle(fontSize: 16),
-        ),
-      );
-    }).toList();
-  }
+  const _StatChip({Key? key, required this.label}) : super(key: key);
 
-  /// Returns a list of placeholder widgets for the cooking steps.
-  List<Widget> _buildCookingSteps() {
-    // Replace with actual steps from recipe if available.
-    List<String> steps = [
-      "Preheat your oven to 350°F.",
-      "Mix ingredient A and B in a bowl.",
-      "Season with salt and pepper.",
-      "Bake for 20 minutes.",
-    ];
-
-    return steps.map((step) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Text(
-          step,
-          style: const TextStyle(fontSize: 16),
-        ),
-      );
-    }).toList();
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(
+        label,
+        style: const TextStyle(fontSize: 14, color: Colors.white),
+      ),
+      backgroundColor: getRandomPastelColor(),
+      elevation: 2,
+    );
   }
 }

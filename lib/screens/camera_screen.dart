@@ -1,7 +1,10 @@
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/material.dart';
-
-//Camera interface
+import 'package:grocery_trak_web/models/item_model.dart';
+import 'package:grocery_trak_web/models/userItem_model.dart';
+import 'dart:io'; // Only used on mobile
+import 'package:grocery_trak_web/services/userItem_api_service.dart';
 
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -19,7 +22,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize the controller with the provided camera and desired resolution.
+    // Initialize the camera.
     _controller = CameraController(
       widget.camera,
       ResolutionPreset.high,
@@ -29,43 +32,71 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _captureAndPredict() async {
+    try {
+      await _initializeControllerFuture;
+      final image = await _controller.takePicture();
+      // print("Image: $image");
+      UserItemModel predictedItem= UserItemModel(userId: 0 ,itemId: 0,item: ItemModel(id: 0, name: "NA", description: "NA"),quantity: 0, unit: "N/A");
+
+
+      if (kIsWeb) {
+        // // For web: read image bytes and use a custom API method.
+        // // print("IN if");
+        // Uint8List imageBytes = await image.readAsBytes();
+
+        // // final imageBytes = await image.readAsBytes();
+        // // print("after finaal");
+        // predictedItem = await ItemApiService.predictItemFromBytes(imageBytes, image.name);
+      } else {
+        // For mobile: use the file from image.path.
+        final imageFile = File(image.path);
+        predictedItem = await UserItemApiService.predictItem(imageFile);
+      }
+
+      // Show the predicted item result.
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Predicted Item"),
+          content: Text("Item Name: ${predictedItem.item.name}"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      print("Error capturing image: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error capturing or predicting image')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Capture Fridge Image'),
-      ),
+      appBar: AppBar(title: Text('Capture Fridge Image')),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            // If the controller is initialized, display the camera preview.
             return CameraPreview(_controller);
           } else {
-            // Otherwise, show a loading indicator.
             return Center(child: CircularProgressIndicator());
           }
         },
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.camera_alt),
-        onPressed: () async {
-          try {
-            // Ensure the camera is initialized.
-            await _initializeControllerFuture;
-            // Capture the image.
-            final image = await _controller.takePicture();
-            // Return the image path to the previous screen.
-            Navigator.pop(context, image.path);
-          } catch (e) {
-            print(e);
-          }
-        },
+        onPressed: _captureAndPredict,
       ),
     );
   }
