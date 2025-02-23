@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:grocery_trak_web/models/item_model.dart';
+import 'package:grocery_trak_web/main.dart';
 import 'package:grocery_trak_web/models/userItem_model.dart';
-import 'package:grocery_trak_web/services/item_api_service.dart';
 import 'package:grocery_trak_web/services/userItem_api_service.dart';
 import 'widgets/app_bar.dart';
 import 'widgets/bottom_nav_bar.dart';
@@ -22,7 +21,9 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with RouteAware {
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
   int _selectedIndex = 0;
   List<UserItemModel> _allIngredients = [];
   List<UserItemModel> ingredients = [];
@@ -35,6 +36,27 @@ class _MyHomePageState extends State<MyHomePage> {
     _generateInfo();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when the current route is re-displayed after popping another route.
+    _generateInfo();
+  }
+  
   Future<void> _generateInfo() async {
     // Load all ingredients once
     try {

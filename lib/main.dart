@@ -12,9 +12,12 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorObservers: [routeObserver],
       title: 'Grocery Trak',
       debugShowCheckedModeBanner: false,
       home: MyHomePage(
