@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../models/recipe_model.dart';
 import '../widgets/recipe_details_page.dart';
 
@@ -58,32 +57,40 @@ class RecipeGrid extends StatelessWidget {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  // This ensures children are centered horizontally.
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Display the imageLink if available; fall back to icon if not.
                     if (recipe.imageLink.isNotEmpty)
-                          Image.network(
-                              recipe.imageLink,
-                              height: 70,
-                              fit: BoxFit.cover,
-                            )
+                      Image.network(
+                        recipe.imageLink,
+                        height: 70,
+                        fit: BoxFit.cover,
+                      )
                     else
                       const Icon(
                         Icons.restaurant_menu,
                         size: 70,
                         color: Colors.grey,
                       ),
+
+                    // Center the recipe name text
                     Text(
                       recipe.name,
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
                         fontSize: 16,
                       ),
                     ),
+
+                    // Center the difficulty/duration/kcal text
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         '${recipe.difficulty} | ${recipe.duration} mins | ${recipe.kcal} kCal',
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Color(0xff7B6B72),
                           fontSize: 13,
@@ -91,14 +98,14 @@ class RecipeGrid extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Wrap the View button with InkWell for tap detection.
+
+                    // "View" button
                     InkWell(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                RecipeDetailsPage(recipe: recipe),
+                            builder: (context) => RecipeDetailsPage(recipe: recipe),
                           ),
                         );
                       },

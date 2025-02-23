@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 
 // Global variable to hold available cameras.
 late List<CameraDescription> cameras;
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +13,6 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
   @override
   Widget build(BuildContext context) {
