@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:grocery_trak_web/models/userItem_model.dart';
 
 class UserItemApiService {
-  static const String _baseUrl = 'http://localhost:8080';
+  static const String _baseUrl = 'https://backend.grocerytrak.com';
 
   // Create an instance of FlutterSecureStorage
   static final FlutterSecureStorage _storage = FlutterSecureStorage();

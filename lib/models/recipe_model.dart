@@ -9,6 +9,7 @@ class RecipeModel {
   final int kcal;
   final String? iconPath;
   List<ItemModel> ingredients;
+  // final bool vegan,
 
   RecipeModel({
     required this.id, // id must remain required for consistency

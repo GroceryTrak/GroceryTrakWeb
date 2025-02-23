@@ -23,7 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  final AuthService _authService = AuthService(baseUrl: "http://localhost:8080");
+  final AuthService _authService = AuthService(baseUrl: "https://backend.grocerytrak.com");
   bool _isLoading = false;
 
   void _signUp() async {
@@ -44,7 +44,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _usernameController.text.trim(),
         _passwordController.text.trim(),
       );
-    print("Response Body: ${result}");
 
 
       // Navigate to the Login screen after a successful sign-up.

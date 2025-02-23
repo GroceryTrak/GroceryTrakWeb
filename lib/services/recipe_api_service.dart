@@ -4,7 +4,7 @@ import '../models/recipe_model.dart';
 
 class RecipeApiService {
   // Update baseUrl to match your backend API URL.
-  static const String baseUrl = "http://localhost:8080";
+  static const String baseUrl = "https://backend.grocerytrak.com";
 
   /// Fetches a recipe by its ID.
   static Future<RecipeModel> fetchRecipeById(int id) async {

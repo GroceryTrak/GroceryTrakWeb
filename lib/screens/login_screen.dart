@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   // Initialize your AuthService with the appropriate base URL.
-  final AuthService _authService = AuthService(baseUrl: "http://localhost:8080");
+  final AuthService _authService = AuthService(baseUrl: "https://backend.grocerytrak.com");
 
   bool _isLoading = false;
 
