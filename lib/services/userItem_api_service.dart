@@ -116,6 +116,8 @@ class UserItemApiService {
 
   /// Predict item by sending an image file (for mobile).
   static Future<UserItemModel> predictItem(File imageFile) async {
+    final headers = await _getHeaders();
+
     try {
       String fileName = imageFile.path.split('/').last;
       FormData formData = FormData.fromMap({
@@ -135,9 +137,12 @@ class UserItemApiService {
       ));
 
       Response response = await _dio.post(
-        '/user-item/predict',
+        '/user_item/predict', // Adjust the endpoint if necessary.
         data: formData,
-        options: Options(contentType: 'multipart/form-data'),
+        options: Options(
+          headers: headers,
+          contentType: 'multipart/form-data',
+        ),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return UserItemModel.fromJson(response.data);
