@@ -88,7 +88,12 @@ class _CameraScreenState extends State<CameraScreen> {
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_controller);
+            return Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                CameraPreview(_controller),
+              ],
+            );
           } else {
             return Center(child: CircularProgressIndicator());
           }
