@@ -1,14 +1,21 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:grocery_trak_web/home.dart';
-import 'package:camera/camera.dart';
 
 // Global variable to hold available cameras.
-late List<CameraDescription> cameras;
+List<CameraDescription>? cameras;
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  cameras = await availableCameras(); // Camera variable
+  
+  try {
+    cameras = await availableCameras();
+  } catch (e) {
+    print('Camera initialization failed: $e');
+    cameras = null;
+  }
+  
   runApp(MyApp());
 }
 
@@ -22,7 +29,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: MyHomePage(
         title: 'Grocery Trak',
-        camera: cameras.first, // Pass the first available camera.
+        camera: cameras?.first, // Pass the first available camera if any.
       ),
     );
   }

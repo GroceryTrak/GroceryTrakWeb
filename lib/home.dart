@@ -1,21 +1,22 @@
-import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:grocery_trak_web/main.dart';
 import 'package:grocery_trak_web/models/userItem_model.dart';
 import 'package:grocery_trak_web/services/userItem_api_service.dart';
-import 'widgets/app_bar.dart';
-import 'widgets/bottom_nav_bar.dart';
-import 'widgets/multi_search.dart';
-import 'widgets/ingredients_list.dart';
-import 'widgets/recipe_grid.dart';
+
 import 'models/recipe_model.dart';
 import 'services/recipe_api_service.dart';
+import 'widgets/app_bar.dart';
+import 'widgets/bottom_nav_bar.dart';
+import 'widgets/ingredients_list.dart';
+import 'widgets/multi_search.dart';
+import 'widgets/recipe_grid.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;
-  final CameraDescription camera;
+  final CameraDescription? camera;
 
-  MyHomePage({super.key, required this.title, required this.camera});
+  MyHomePage({super.key, required this.title, this.camera});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();

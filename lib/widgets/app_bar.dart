@@ -1,10 +1,11 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:camera/camera.dart';
+
 import '../screens/camera_screen.dart';
 import '../screens/profile.dart';
 
-AppBar buildAppBar(BuildContext context, CameraDescription camera) {
+AppBar buildAppBar(BuildContext context, CameraDescription? camera) {
   return AppBar(
     backgroundColor: Colors.green,
     title: Text('Grocery Trak'),
@@ -20,10 +21,11 @@ AppBar buildAppBar(BuildContext context, CameraDescription camera) {
     actions: [
       PopupMenuButton<int>(
         itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 1,
-            child: Row(children: [Icon(Icons.camera), SizedBox(width: 10), Text("Scan")]),
-          ),
+          if (camera != null)  // Only show camera option if camera is available
+            PopupMenuItem(
+              value: 1,
+              child: Row(children: [Icon(Icons.camera), SizedBox(width: 10), Text("Scan")]),
+            ),
           PopupMenuItem(
             value: 2,
             child: Row(children: [Icon(Icons.star), SizedBox(width: 10), Text("Profile")]),
@@ -34,7 +36,7 @@ AppBar buildAppBar(BuildContext context, CameraDescription camera) {
           ),
         ],
         onSelected: (value) {
-          if (value == 1) {
+          if (value == 1 && camera != null) {
             Navigator.push(context, MaterialPageRoute(builder: (context) => CameraScreen(camera: camera)));
           } else if (value == 2) {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfilePage()));
