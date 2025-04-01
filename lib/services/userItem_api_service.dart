@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'package:grocery_trak_web/models/userItem_model.dart';
 import 'dart:io';
-import 'package:http_parser/http_parser.dart';
-import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:grocery_trak_web/models/userItem_model.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class UserItemApiService {
   static const String _baseUrl = 'https://backend.grocerytrak.com';
@@ -99,10 +99,22 @@ class UserItemApiService {
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => UserItemModel.fromJson(json)).toList();
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final dynamic userItems = responseData['user_items'];
+      
+      if (userItems == null) {
+        return [];
+      }
+      
+      if (userItems is List) {
+        return userItems.map((json) => UserItemModel.fromJson(json)).toList();
+      }
+      
+      print('Unexpected response format: $userItems');
+      return [];
     } else {
-      throw Exception('Failed to fetch user items');
+      print('Failed to fetch user items. Status code: ${response.statusCode}');
+      return [];
     }
   }
 
