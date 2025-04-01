@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../models/recipe_model.dart';
 
 class RecipeApiService {
@@ -15,17 +17,22 @@ class RecipeApiService {
     } else {
       throw Exception('Failed to load recipe');
     }
-
   }
 
   /// Searches recipes by name using a query parameter.
   static Future<List<RecipeModel>> searchRecipes(String query) async {
-    final response = await http.get(Uri.parse('$baseUrl/recipe/search?q=$query'));
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map((data) => RecipeModel.fromJson(data)).toList();
-    } else {
-      throw Exception('Failed to search recipes');
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/recipe/search?q=$query'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final List<dynamic> recipes = jsonData['recipes'] ?? [];
+        return recipes.map((data) => RecipeModel.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to search recipes');
+      }
+    } catch (e) {
+      return [];
     }
   }
 

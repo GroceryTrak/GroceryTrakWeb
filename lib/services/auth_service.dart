@@ -14,22 +14,39 @@ class AuthService {
   /// Returns a map containing user data and token on success.
   Future<Map<String, dynamic>> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/auth/login');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
-    );
-    print("Response Body: ${response.body}");
+    
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      // Successful login returns user data and token.
-      return {'token': response.body};
-    } else {
-      // You can customize error handling based on your API response.
-      throw Exception('Failed to login: ${response.body}');
+      print('Login response status: ${response.statusCode}');
+      print('Login response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Parse the response body as JSON
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        
+        // Get the token directly from the response
+        final token = responseData['token'];
+        
+        if (token == null) {
+          throw Exception('No token found in response');
+        }
+
+        print('Successfully extracted token: ${token.substring(0, 20)}...');
+        return {'token': token};
+      } else {
+        throw Exception('Failed to login: ${response.body}');
+      }
+    } catch (e) {
+      print('Login error: $e');
+      rethrow;
     }
   }
 
