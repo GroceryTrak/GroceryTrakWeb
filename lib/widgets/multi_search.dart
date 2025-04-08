@@ -15,6 +15,7 @@ class _MultiSelectSearchBarState extends State<MultiSelectSearchBar> {
   List<String> options = [];
   List<String> selectedOptions = [];
   bool isLoading = true;
+  List<UserItemModel> detectedItems = UserItemApiService.sessionDetectedItems;
 
   @override
   void initState() {
@@ -31,10 +32,34 @@ class _MultiSelectSearchBarState extends State<MultiSelectSearchBar> {
           .map((r) => '${r.item.name} (${r.itemId})')
           .toList();
 
+      // Prepare a set of detected item IDs for this session
+      Set<int> detectedIds = UserItemApiService.sessionDetectedItems
+          .map((item) => item.itemId)
+          .toSet();
+
+      // Find all options whose itemId is in the detected set
+      List<String> autoSelected = response
+          .where((r) => detectedIds.contains(r.itemId))
+          .map((r) => '${r.item.name} (${r.itemId})')
+          .toList();
+
       setState(() {
         options = items;
+        selectedOptions = autoSelected;
         isLoading = false;
       });
+
+      // Trigger selection callback with detected ingredients
+      if (autoSelected.isNotEmpty) {
+        List<String> ingredientIds = autoSelected.map((option) {
+          final regex = RegExp(r'\((.*?)\)');
+          final match = regex.firstMatch(option);
+          return match != null ? match.group(1)!.trim() : '';
+        }).where((id) => id.isNotEmpty).toList();
+
+        String query = "&ingredients=" + ingredientIds.join(',');
+        widget.onSelectionDone(query);
+      }
     } catch (e) {
       setState(() {
         isLoading = false;

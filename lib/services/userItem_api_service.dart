@@ -14,6 +14,11 @@ class UserItemApiService {
   // Create an instance of FlutterSecureStorage
   static final FlutterSecureStorage _storage = FlutterSecureStorage();
 
+  // Store Detected items for this user session
+  static List<UserItemModel> _sessionDetectedItems = [];
+
+  static List<UserItemModel> get sessionDetectedItems => _sessionDetectedItems;
+
   get itemModel => null;
 
   // Helper method to retrieve headers with the latest token.
@@ -100,6 +105,7 @@ class UserItemApiService {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
+      print("Response Body: ${response.body}");
       return data.map((json) => UserItemModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch user items');
@@ -127,7 +133,6 @@ class UserItemApiService {
           contentType: MediaType('image', 'jpeg'),
         ),
       });
-
       
       _dio.interceptors.add(LogInterceptor(
         request: true,
@@ -145,7 +150,9 @@ class UserItemApiService {
         ),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return UserItemModel.fromJson(response.data);
+        final item = UserItemModel.fromJson(response.data);
+        _sessionDetectedItems.add(item);
+        return item;
       } else {
         throw Exception('Failed to predict item (Status: ${response.statusCode})');
       }
