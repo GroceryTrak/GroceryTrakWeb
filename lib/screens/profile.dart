@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:grocery_trak_web/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'login_screen.dart';
 
 // Ensure you have this function implemented, for example:
 Future<String?> loadUsername() async {
@@ -29,6 +29,25 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       username = loadedUsername;
     });
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      await AuthService.logout();
+      if (mounted) {
+        // Navigate to login screen and remove all previous routes
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/login',
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error logging out: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -78,14 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     context,
                     icon: Icons.logout,
                     title: 'Sign Out',
-                    onTap: () {
-                      // Add any additional sign-out logic before navigation if needed.
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
-                        (route) => false,
-                      );
-                    },
+                    onTap: _handleLogout,
                   ),
                 ],
               ),

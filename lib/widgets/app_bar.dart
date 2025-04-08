@@ -1,15 +1,35 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:camera/camera.dart';
+import 'package:grocery_trak_web/services/auth_service.dart';
+
 import '../screens/camera_screen.dart';
 import '../screens/profile.dart';
 
-AppBar buildAppBar(BuildContext context, CameraDescription camera) {
+AppBar buildAppBar(BuildContext context, CameraDescription? camera) {
+  Future<void> handleSignOut() async {
+    try {
+      await AuthService.logout();
+      if (context.mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/login',
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error signing out: $e')),
+        );
+      }
+    }
+  }
+
   return AppBar(
     backgroundColor: Colors.green,
-    title: Text('Grocery Trak'),
+    title: const Text('Grocery Trak'),
     leading: Container(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.amber[100],
@@ -20,28 +40,31 @@ AppBar buildAppBar(BuildContext context, CameraDescription camera) {
     actions: [
       PopupMenuButton<int>(
         itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 1,
-            child: Row(children: [Icon(Icons.camera), SizedBox(width: 10), Text("Scan")]),
-          ),
-          PopupMenuItem(
+          if (camera != null)  // Only show camera option if camera is available
+            const PopupMenuItem(
+              value: 1,
+              child: Row(children: [Icon(Icons.camera), SizedBox(width: 10), Text("Scan")]),
+            ),
+          const PopupMenuItem(
             value: 2,
             child: Row(children: [Icon(Icons.star), SizedBox(width: 10), Text("Profile")]),
           ),
-          PopupMenuItem(
+          const PopupMenuItem(
             value: 3,
-            child: Row(children: [Icon(Icons.chrome_reader_mode), SizedBox(width: 10), Text("Sign Out")]),
+            child: Row(children: [Icon(Icons.logout), SizedBox(width: 10), Text("Sign Out")]),
           ),
         ],
         onSelected: (value) {
-          if (value == 1) {
+          if (value == 1 && camera != null) {
             Navigator.push(context, MaterialPageRoute(builder: (context) => CameraScreen(camera: camera)));
           } else if (value == 2) {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfilePage()));
+          } else if (value == 3) {
+            handleSignOut();
           }
         },
         child: Container(
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           alignment: Alignment.center,
           width: 37,
           decoration: BoxDecoration(color: Colors.amber[100], borderRadius: BorderRadius.circular(10)),

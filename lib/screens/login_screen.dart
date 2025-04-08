@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:grocery_trak_web/main.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:grocery_trak_web/screens/signup_screen.dart';
 import 'package:grocery_trak_web/services/auth_service.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -35,61 +34,74 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   void _login() async {
-  try {
-    final result = await _authService.login(
-      _usernameController.text.trim(),
-      _passwordController.text.trim(),
-    );
+    setState(() {
+      _isLoading = true;
+    });
 
-    // Suppose the result is either a JSON map or { 'token': '...' }.
-    final token = result['token'];
-    final username = _usernameController.text.trim(); // or result['username'] if available
-
-    if (token != null) {
-      // Store token securely.
-      await storage.write(key: 'jwt_token', value: token);
-      await saveUsername(username);
-
-      // Navigate to home screen, etc.
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => MyApp()),
+    try {
+      final result = await _authService.login(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
       );
+
+      // Suppose the result is either a JSON map or { 'token': '...' }.
+      final token = result['token'];
+      final username = _usernameController.text.trim(); // or result['username'] if available
+
+      if (token != null) {
+        // Store token securely.
+        await storage.write(key: 'jwt_token', value: token);
+        await saveUsername(username);
+
+        if (!mounted) return;
+
+        // Navigate to home screen using named route
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/home',
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-  } catch (e) {
-    // Handle error
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Login failed: $e')),
-    );
   }
-}
 
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login"),
+        title: const Text("Login"),
         backgroundColor: Colors.green,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             TextField(
               controller: _usernameController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 labelText: "Username",
-                hintText: "Enter your usernmae",
+                hintText: "Enter your username",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: const Icon(Icons.email),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               controller: _passwordController,
               obscureText: true,
@@ -99,32 +111,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
-                prefixIcon: Icon(Icons.lock),
+                prefixIcon: const Icon(Icons.lock),
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: _isLoading ? null : _login,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
               child: _isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
-                  : Text("Login", style: TextStyle(fontSize: 16)),
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("Login", style: TextStyle(fontSize: 16)),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpScreen()),
+                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
                 );
               },
-              child: Text("Don't have an account? Sign Up"),
+              child: const Text("Don't have an account? Sign Up"),
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:grocery_trak_web/models/item_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,24 +12,28 @@ class ItemApiService {
   /// Fetches a item by its ID.
   static Future<ItemModel> fetchItemById(int id) async {
     final response = await http.get(Uri.parse('$baseUrl/item/$id'));
-    print(response);
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       return ItemModel.fromJson(jsonData);
     } else {
       throw Exception('Failed to load item');
     }
-
   }
 
   /// Searches items by name using a query parameter.
   static Future<List<ItemModel>> searchItems(String query) async {
-    final response = await http.get(Uri.parse('$baseUrl/item/search?q=$query'));
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map((data) => ItemModel.fromJson(data)).toList();
-    } else {
-      throw Exception('Failed to search items');
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/item/search?q=$query'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final List<dynamic> items = jsonData['items'] ?? [];
+        return items.map((data) => ItemModel.fromJson(data)).toList();
+      } else {
+        throw Exception('Failed to search items');
+      }
+    } catch (e) {
+      return [];
     }
   }
 
