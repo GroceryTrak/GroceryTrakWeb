@@ -25,24 +25,12 @@ class AuthService {
         }),
       );
 
-      print('Login response status: ${response.statusCode}');
-      print('Login response body: ${response.body}');
-
       if (response.statusCode == 200) {
-        // Parse the response body as JSON
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        
-        // Get the token directly from the response
-        final token = responseData['token'];
-        
-        if (token == null) {
-          throw Exception('No token found in response');
-        }
-
-        print('Successfully extracted token: ${token.substring(0, 20)}...');
-        return {'token': token};
+        final data = json.decode(response.body);
+        return {'token': data['token']};
       } else {
-        throw Exception('Failed to login: ${response.body}');
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['error'] ?? 'Authentication failed');
       }
     } catch (e) {
       print('Login error: $e');

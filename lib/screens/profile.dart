@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:grocery_trak_web/home.dart';
+import 'package:grocery_trak_web/screens/grocery.dart';
 import 'package:grocery_trak_web/services/auth_service.dart';
+import 'package:grocery_trak_web/widgets/bottom_nav_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Ensure you have this function implemented, for example:
@@ -57,6 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
         title: const Text('Profile'),
         backgroundColor: Colors.green,
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -104,6 +108,23 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: 2, // Profile is the last tab
+        onItemTapped: (index) {
+          // Handle navigation based on index
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MyHomePage(title: 'GroceryTrak')),
+            );
+          } else if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const GroceryPage()),
+            );
+          }
+        },
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
+
 import '../models/recipe_model.dart';
 import '../widgets/recipe_details_page.dart';
 

@@ -1,13 +1,11 @@
 import 'dart:convert';
 
+import 'package:grocery_trak_web/config/config.dart';
 import 'package:grocery_trak_web/models/item_model.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class ItemApiService {
-  // Update baseUrl to match your backend API URL.
-  static const String baseUrl = "https://backend.grocerytrak.com";
+  static String get baseUrl => Config.backendUri;
 
   /// Fetches a item by its ID.
   static Future<ItemModel> fetchItemById(int id) async {

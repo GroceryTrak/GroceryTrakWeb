@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/camera_screen.dart';
+import '../screens/grocery.dart';
 import '../screens/profile.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -24,6 +25,10 @@ class BottomNavBar extends StatelessWidget {
         icon: Icon(Icons.home),
         label: 'Home',
       ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.shopping_basket),
+        label: 'Grocery',
+      ),
       if (camera != null)
         const BottomNavigationBarItem(
           icon: Icon(Icons.camera_alt),
@@ -40,8 +45,17 @@ class BottomNavBar extends StatelessWidget {
       selectedItemColor: Colors.green,
       items: navigationItems,
       onTap: (index) {
+        // Handle grocery navigation
+        if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const GroceryPage()),
+          );
+          return;
+        }
+
         // Handle camera navigation
-        if (camera != null && index == 1) {
+        if (camera != null && index == 2) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => CameraScreen(camera: camera!)),
@@ -50,9 +64,9 @@ class BottomNavBar extends StatelessWidget {
         }
 
         // Handle profile navigation
-        // If camera is not available, profile is at index 1
-        // If camera is available, profile is at index 2
-        final isProfileTab = camera != null ? index == 2 : index == 1;
+        // If camera is not available, profile is at index 2
+        // If camera is available, profile is at index 3
+        final isProfileTab = camera != null ? index == 3 : index == 2;
         
         if (isProfileTab) {
           Navigator.push(

@@ -4,12 +4,13 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:grocery_trak_web/config/config.dart';
 import 'package:grocery_trak_web/models/userItem_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 class UserItemApiService {
-  static const String _baseUrl = 'https://backend.grocerytrak.com';
+  static String get _baseUrl => Config.backendUri;
 
   // Create an instance of FlutterSecureStorage
   static final FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -170,7 +171,7 @@ class UserItemApiService {
 
   static final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "https://backend.grocerytrak.com",
+      baseUrl: Config.backendUri,
       connectTimeout: Duration(seconds: 10),
       receiveTimeout: Duration(seconds: 10),
     ),

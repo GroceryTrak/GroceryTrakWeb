@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:grocery_trak_web/models/userItem_model.dart';
 
 
@@ -14,7 +13,7 @@ class IngredientsList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.only(left: 30),
+          padding: EdgeInsets.only(left: 20),
           child: Text(
             'Ingredients',
             style: TextStyle(
