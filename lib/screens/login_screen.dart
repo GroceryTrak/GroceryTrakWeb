@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:grocery_trak_web/config/config.dart';
 import 'package:grocery_trak_web/screens/signup_screen.dart';
 import 'package:grocery_trak_web/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   // Initialize your AuthService with the appropriate base URL.
-  final AuthService _authService = AuthService(baseUrl: Config.backendUri);
+  final AuthService _authService = AuthService(baseUrl: "https://backend.grocerytrak.com");
 
   bool _isLoading = false;
 

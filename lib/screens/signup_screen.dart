@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:grocery_trak_web/config/config.dart';
-import 'package:grocery_trak_web/screens/login_screen.dart';
-import 'package:grocery_trak_web/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:grocery_trak_web/services/auth_service.dart';
+import 'package:grocery_trak_web/screens/login_screen.dart';
 
 /// Utility function to save the username.
 Future<void> saveUsername(String username) async {
@@ -24,7 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  final AuthService _authService = AuthService(baseUrl: Config.backendUri);
+  final AuthService _authService = AuthService(baseUrl: "https://backend.grocerytrak.com");
   bool _isLoading = false;
 
   void _signUp() async {
